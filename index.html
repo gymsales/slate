@@ -223,21 +223,44 @@
       <ul id="toc" class="toc-list-h1">
           <li>
             <a href="#introduction" class="toc-h1 toc-link" data-title="Introduction">Introduction</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#json-bodies" class="toc-h2 toc-link" data-title="JSON Bodies">JSON Bodies</a>
+                  </li>
+                  <li>
+                    <a href="#http-verbs" class="toc-h2 toc-link" data-title="HTTP Verbs">HTTP Verbs</a>
+                  </li>
+                  <li>
+                    <a href="#limited-http-clients" class="toc-h2 toc-link" data-title="Limited HTTP Clients">Limited HTTP Clients</a>
+                  </li>
+                  <li>
+                    <a href="#responses" class="toc-h2 toc-link" data-title="Responses">Responses</a>
+                  </li>
+                  <li>
+                    <a href="#http-status-codes" class="toc-h2 toc-link" data-title="HTTP Status Codes">HTTP Status Codes</a>
+                  </li>
+              </ul>
           </li>
           <li>
             <a href="#authentication" class="toc-h1 toc-link" data-title="Authentication">Authentication</a>
           </li>
           <li>
-            <a href="#kittens" class="toc-h1 toc-link" data-title="Kittens">Kittens</a>
+            <a href="#resources" class="toc-h1 toc-link" data-title="Resources">Resources</a>
+          </li>
+          <li>
+            <a href="#companies" class="toc-h1 toc-link" data-title="Companies">Companies</a>
               <ul class="toc-list-h2">
                   <li>
-                    <a href="#get-all-kittens" class="toc-h2 toc-link" data-title="Get All Kittens">Get All Kittens</a>
+                    <a href="#the-company-object" class="toc-h2 toc-link" data-title="The Company Object">The Company Object</a>
                   </li>
                   <li>
-                    <a href="#get-a-specific-kitten" class="toc-h2 toc-link" data-title="Get a Specific Kitten">Get a Specific Kitten</a>
+                    <a href="#create-a-company" class="toc-h2 toc-link" data-title="Create a Company">Create a Company</a>
                   </li>
                   <li>
-                    <a href="#delete-a-specific-kitten" class="toc-h2 toc-link" data-title="Delete a Specific Kitten">Delete a Specific Kitten</a>
+                    <a href="#retrieve-a-company" class="toc-h2 toc-link" data-title="Retrieve a Company">Retrieve a Company</a>
+                  </li>
+                  <li>
+                    <a href="#update-a-company" class="toc-h2 toc-link" data-title="Update a Company">Update a Company</a>
                   </li>
               </ul>
           </li>
@@ -254,190 +277,503 @@
       <div class="dark-box"></div>
       <div class="content">
         <h1 id='introduction'>Introduction</h1>
-<p>Welcome to the Kittn API! You can use our API to access Kittn API endpoints, which can get information on various cats, kittens, and breeds in our database.</p>
+<p>GymSales is a fully hosted lead management system for the fitness industry. We provide a <a href="http://en.wikipedia.org/wiki/Representational_state_transfer">REST</a> API built on <a href="http://www.vinaysahni.com/best-practices-for-a-pragmatic-restful-api">pragmatic RESTful design</a> principles.</p>
 
-<p>We have language bindings in Shell, Ruby, Python, and JavaScript! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.</p>
+<p>Our API uses resource-oriented URLs that leverage built in features of HTTP, like authentication, verbs and response codes. All request and response bodies are <a href="http://en.wikipedia.org/wiki/JSON">JSON</a> encoded, including error responses. Any off-the-shelf HTTP client can be used to communicate with the API.</p>
 
-<p>This example API documentation page was created with <a href="https://github.com/lord/slate">Slate</a>. Feel free to edit it and use it as a base for your own API&#39;s documentation.</p>
+<p>We believe an API is a user interface for a developer - accordingly, we&#39;ve made sure our API can be easily explored from the browser!</p>
+<h2 id='json-bodies'>JSON Bodies</h2>
+<p>All <code>POST</code>, <code>PUT</code> requests are <a href="http://en.wikipedia.org/wiki/JSON">JSON</a> encoded and must have have content type of <code>application/x-www-form-urlencoded</code> or <code>application/json</code>, or the API will return a <code>415 Unsupported Media Type</code> status code.</p>
+<pre class="highlight shell tab-shell"><code>curl -u email:password https://login.gymsales.net/api/v1/users/12345 <span class="se">\</span>
+    -X PUT <span class="se">\</span>
+    -H <span class="s1">'Content-Type: application/json'</span> <span class="se">\</span>
+    -d <span class="s1">'{"first_name":"John"}'</span>
+</code></pre>
+<blockquote>
+<p>Raw HTTP Request:</p>
+</blockquote>
+<pre class="highlight http tab-http"><code><span class="nf">PUT</span> <span class="nn">/api/v1/users/12345</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Authorization</span><span class="p">:</span> <span class="s">Basic ZW1haWw6cGFzc3dvcmQ=</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">login.gymsales.net</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">*/*</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+<span class="na">Content-Length</span><span class="p">:</span> <span class="s">21</span>
+
+<span class="p">{</span><span class="s2">"first_name"</span><span class="p">:</span><span class="s2">"John"</span><span class="p">}</span><span class="w">
+</span></code></pre><h2 id='http-verbs'>HTTP Verbs</h2>
+<p>We use standard HTTP verbs to indicate intent of a request:</p>
+
+<ul>
+<li>  <code>GET</code> - To retrieve a resource or a collection of resources</li>
+<li>  <code>POST</code> - To create a resource</li>
+<li>  <code>PUT</code> - To modify a resource</li>
+<li>  <code>DELETE</code> - To delete a resource</li>
+</ul>
+<h2 id='limited-http-clients'>Limited HTTP Clients</h2>
+<p>If you are using an HTTP client that doesn&#39;t support <code>PUT</code>, <code>PATCH</code> or <code>DELETE</code> requests, send a <code>POST</code>request with an <code>X-HTTP-Method-Override</code> header specifying the desired verb.</p>
+<pre class="highlight shell tab-shell"><code>curl -u email:password https://login.gymsales.net/api/v1/users/1234 <span class="se">\</span>
+    -X POST <span class="se">\</span>
+    -H <span class="s2">"X-HTTP-Method-Override: DELETE"</span>
+</code></pre>
+<blockquote>
+<p>Raw HTTP Request:</p>
+</blockquote>
+<pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/api/v1/users/12345</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Authorization</span><span class="p">:</span> <span class="s">Basic ZW1haWw6cGFzc3dvcmQ=</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">login.gymsales.net</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">*/*</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+<span class="na">Content-Length</span><span class="p">:</span> <span class="s">21</span>
+<span class="na">X-HTTP-Method-Override</span><span class="p">:</span> <span class="s">DELETE</span>
+</code></pre><h2 id='responses'>Responses</h2>
+<p>All response bodies are <a href="http://en.wikipedia.org/wiki/JSON">JSON</a> encoded.</p>
+
+<blockquote>
+<p>A single resource is represented as a JSON object:</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"field1"</span><span class="p">:</span><span class="w"> </span><span class="s2">"value"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"field2"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"field3"</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<blockquote>
+<p>A collection of resources is represented as a JSON array of objects named <code>collection</code> and a <code>pagination</code> object with total pages and total entries fields:</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+</span><span class="err"> </span><span class="w"> </span><span class="s2">"collection"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+</span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="s2">"field1"</span><span class="p">:</span><span class="w"> </span><span class="s2">"value"</span><span class="p">,</span><span class="w">
+</span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="s2">"field2"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+</span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="s2">"field3"</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="w">
+</span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="p">},</span><span class="w">
+</span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="s2">"field1"</span><span class="p">:</span><span class="w"> </span><span class="s2">"another value"</span><span class="p">,</span><span class="w">
+</span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="s2">"field2"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+</span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="s2">"field3"</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="w">
+</span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="p">}</span><span class="w">
+</span><span class="err"> </span><span class="w"> </span><span class="p">],</span><span class="w">
+</span><span class="err"> </span><span class="w"> </span><span class="s2">"pagination"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="s2">"total_pages"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+</span><span class="err"> </span><span class="w"> </span><span class="err"> </span><span class="w"> </span><span class="s2">"total_entries"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="w">
+</span><span class="err"> </span><span class="w"> </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<p>Timestamps are in company time zone and formatted as <a href="http://en.wikipedia.org/wiki/ISO_8601">ISO8601</a>.</p>
+
+<p>Unset fields will be represented as a <code>null</code> instead of not being present. If the field is an array, it will be represented as an empty array - ie <code>[]</code>.</p>
+<h2 id='http-status-codes'>HTTP Status Codes</h2>
+<p>We use HTTP status codes to indicate success or failure of a request.</p>
+
+<p>Success codes:</p>
+
+<ul>
+<li>  <code>200 OK</code> - Request succeeded. Response included</li>
+<li>  <code>201 Created</code> - Resource created. URL to new resource in Location header</li>
+<li>  <code>204 No Content</code> - Request succeeded, but no response body</li>
+</ul>
+
+<p>Error codes:</p>
+
+<ul>
+<li>  <code>400 Bad Request</code> - Could not parse request</li>
+<li>  <code>401 Unauthorized</code> - No authentication credentials provided or authentication failed</li>
+<li>  <code>403 Forbidden</code> - Authenticated user does not have access</li>
+<li>  <code>404 Not Found</code> - Resource not found</li>
+<li>  <code>415 Unsupported Media Type</code> - POST/PUT/PATCH request occurred without a <code>application/json</code>content type</li>
+<li>  <code>422 Unprocessable Entity</code> - A request to modify or create a resource failed due to a validation error</li>
+<li>  <code>500, 501, 502, 503, etc</code> - An internal server error occured</li>
+</ul>
 <h1 id='authentication'>Authentication</h1>
-<blockquote>
-<p>To authorize, use this code:</p>
-</blockquote>
-<pre class="highlight ruby tab-ruby"><code><span class="nb">require</span> <span class="s1">'kittn'</span>
+<p>This API is authenticated using <a href="https://en.wikipedia.org/wiki/Basic_access_authentication">HTTP Basic Auth</a> over HTTPS. Any requests over plain HTTP will fail.</p>
 
-<span class="n">api</span> <span class="o">=</span> <span class="no">Kittn</span><span class="o">::</span><span class="no">APIClient</span><span class="p">.</span><span class="nf">authorize!</span><span class="p">(</span><span class="s1">'meowmeowmeow'</span><span class="p">)</span>
-</code></pre><pre class="highlight python tab-python"><code><span class="kn">import</span> <span class="nn">kittn</span>
+<p>A user&#39;s email address and password can be provided as auth credentials</p>
 
-<span class="n">api</span> <span class="o">=</span> <span class="n">kittn</span><span class="o">.</span><span class="n">authorize</span><span class="p">(</span><span class="s">'meowmeowmeow'</span><span class="p">)</span>
-</code></pre><pre class="highlight shell tab-shell"><code><span class="c"># With shell, you can just pass the correct header with each request</span>
-curl <span class="s2">"api_endpoint_here"</span>
-  -H <span class="s2">"Authorization: meowmeowmeow"</span>
-</code></pre><pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="nx">kittn</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'kittn'</span><span class="p">);</span>
-
-<span class="kd">let</span> <span class="nx">api</span> <span class="o">=</span> <span class="nx">kittn</span><span class="p">.</span><span class="nx">authorize</span><span class="p">(</span><span class="s1">'meowmeowmeow'</span><span class="p">);</span>
+<p>All requests are associated with a specific user in GymSales and permissions are limited to that user&#39;s capabilities.</p>
+<pre class="highlight shell tab-shell"><code><span class="gp">$ </span>curl -u email:password https://login.gymsales.net/api/v1/
+</code></pre><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/api/v1/users/12345</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Authorization</span><span class="p">:</span> <span class="s">Basic ZW1haWw6cGFzc3dvcmQ=</span>
 </code></pre>
+<p>GymSales expects for the API key to be included in all API requests to the server in a header that looks like the following:</p>
+
+<p><code>Authorization: Basic &lt;credentials&gt;</code>, where credentials is the base64 encoding of id and password joined by a single colon (:).</p>
+<h1 id='resources'>Resources</h1><h1 id='companies'>Companies</h1><h2 id='the-company-object'>The Company Object</h2>
 <blockquote>
-<p>Make sure to replace <code>meowmeowmeow</code> with your API key.</p>
-</blockquote>
-
-<p>Kittn uses API keys to allow access to the API. You can register a new Kittn API key at our <a href="http://example.com/developers">developer portal</a>.</p>
-
-<p>Kittn expects for the API key to be included in all API requests to the server in a header that looks like the following:</p>
-
-<p><code>Authorization: meowmeowmeow</code></p>
-
-<aside class="notice">
-You must replace <code>meowmeowmeow</code> with your personal API key.
-</aside>
-<h1 id='kittens'>Kittens</h1><h2 id='get-all-kittens'>Get All Kittens</h2><pre class="highlight ruby tab-ruby"><code><span class="nb">require</span> <span class="s1">'kittn'</span>
-
-<span class="n">api</span> <span class="o">=</span> <span class="no">Kittn</span><span class="o">::</span><span class="no">APIClient</span><span class="p">.</span><span class="nf">authorize!</span><span class="p">(</span><span class="s1">'meowmeowmeow'</span><span class="p">)</span>
-<span class="n">api</span><span class="p">.</span><span class="nf">kittens</span><span class="p">.</span><span class="nf">get</span>
-</code></pre><pre class="highlight python tab-python"><code><span class="kn">import</span> <span class="nn">kittn</span>
-
-<span class="n">api</span> <span class="o">=</span> <span class="n">kittn</span><span class="o">.</span><span class="n">authorize</span><span class="p">(</span><span class="s">'meowmeowmeow'</span><span class="p">)</span>
-<span class="n">api</span><span class="o">.</span><span class="n">kittens</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-</code></pre><pre class="highlight shell tab-shell"><code>curl <span class="s2">"http://example.com/api/kittens"</span>
-  -H <span class="s2">"Authorization: meowmeowmeow"</span>
-</code></pre><pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="nx">kittn</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'kittn'</span><span class="p">);</span>
-
-<span class="kd">let</span> <span class="nx">api</span> <span class="o">=</span> <span class="nx">kittn</span><span class="p">.</span><span class="nx">authorize</span><span class="p">(</span><span class="s1">'meowmeowmeow'</span><span class="p">);</span>
-<span class="kd">let</span> <span class="nx">kittens</span> <span class="o">=</span> <span class="nx">api</span><span class="p">.</span><span class="nx">kittens</span><span class="p">.</span><span class="nx">get</span><span class="p">();</span>
-</code></pre>
-<blockquote>
-<p>The above command returns JSON structured like this:</p>
-</blockquote>
-<pre class="highlight json tab-json"><code><span class="p">[</span><span class="w">
-  </span><span class="p">{</span><span class="w">
-    </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Fluffums"</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"breed"</span><span class="p">:</span><span class="w"> </span><span class="s2">"calico"</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"fluffiness"</span><span class="p">:</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"cuteness"</span><span class="p">:</span><span class="w"> </span><span class="mi">7</span><span class="w">
-  </span><span class="p">},</span><span class="w">
-  </span><span class="p">{</span><span class="w">
-    </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Max"</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"breed"</span><span class="p">:</span><span class="w"> </span><span class="s2">"unknown"</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"fluffiness"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"cuteness"</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="w">
-  </span><span class="p">}</span><span class="w">
-</span><span class="p">]</span><span class="w">
-</span></code></pre>
-<p>This endpoint retrieves all kittens.</p>
-<h3 id='http-request'>HTTP Request</h3>
-<p><code>GET http://example.com/api/kittens</code></p>
-<h3 id='query-parameters'>Query Parameters</h3>
-<table><thead>
-<tr>
-<th>Parameter</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>include_cats</td>
-<td>false</td>
-<td>If set to true, the result will also include cats.</td>
-</tr>
-<tr>
-<td>available</td>
-<td>true</td>
-<td>If set to false, the result will include kittens that have already been adopted.</td>
-</tr>
-</tbody></table>
-
-<aside class="success">
-Remember — a happy kitten is an authenticated kitten!
-</aside>
-<h2 id='get-a-specific-kitten'>Get a Specific Kitten</h2><pre class="highlight ruby tab-ruby"><code><span class="nb">require</span> <span class="s1">'kittn'</span>
-
-<span class="n">api</span> <span class="o">=</span> <span class="no">Kittn</span><span class="o">::</span><span class="no">APIClient</span><span class="p">.</span><span class="nf">authorize!</span><span class="p">(</span><span class="s1">'meowmeowmeow'</span><span class="p">)</span>
-<span class="n">api</span><span class="p">.</span><span class="nf">kittens</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</code></pre><pre class="highlight python tab-python"><code><span class="kn">import</span> <span class="nn">kittn</span>
-
-<span class="n">api</span> <span class="o">=</span> <span class="n">kittn</span><span class="o">.</span><span class="n">authorize</span><span class="p">(</span><span class="s">'meowmeowmeow'</span><span class="p">)</span>
-<span class="n">api</span><span class="o">.</span><span class="n">kittens</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</code></pre><pre class="highlight shell tab-shell"><code>curl <span class="s2">"http://example.com/api/kittens/2"</span>
-  -H <span class="s2">"Authorization: meowmeowmeow"</span>
-</code></pre><pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="nx">kittn</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'kittn'</span><span class="p">);</span>
-
-<span class="kd">let</span> <span class="nx">api</span> <span class="o">=</span> <span class="nx">kittn</span><span class="p">.</span><span class="nx">authorize</span><span class="p">(</span><span class="s1">'meowmeowmeow'</span><span class="p">);</span>
-<span class="kd">let</span> <span class="nx">max</span> <span class="o">=</span> <span class="nx">api</span><span class="p">.</span><span class="nx">kittens</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
-</code></pre>
-<blockquote>
-<p>The above command returns JSON structured like this:</p>
+<p>The Company object</p>
 </blockquote>
 <pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
-  </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Max"</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"breed"</span><span class="p">:</span><span class="w"> </span><span class="s2">"unknown"</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"fluffiness"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"cuteness"</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="w">
+  </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">452</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"external_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2895</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"API Company"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"apicompany@example.com"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"phone"</span><span class="p">:</span><span class="w"> </span><span class="s2">"+61447135119"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"address"</span><span class="p">:</span><span class="w"> </span><span class="s2">"15 Adelaide street"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"city"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Brisbane"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"QLD"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"zip"</span><span class="p">:</span><span class="w"> </span><span class="s2">"4000"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"country"</span><span class="p">:</span><span class="w"> </span><span class="s2">"AU"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"time_zone"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Brisbane"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"work_time_from"</span><span class="p">:</span><span class="w"> </span><span class="s2">"08:00"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"work_time_into"</span><span class="p">:</span><span class="w"> </span><span class="s2">"20:00"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"active"</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
-<p>This endpoint retrieves a specific kitten.</p>
-
-<aside class="warning">Inside HTML code blocks like this one, you can't use Markdown, so use <code>&lt;code&gt;</code> blocks to denote code.</aside>
-<h3 id='http-request-2'>HTTP Request</h3>
-<p><code>GET http://example.com/kittens/&lt;ID&gt;</code></p>
-<h3 id='url-parameters'>URL Parameters</h3>
 <table><thead>
 <tr>
-<th>Parameter</th>
+<th>Name</th>
+<th>Type</th>
 <th>Description</th>
 </tr>
 </thead><tbody>
 <tr>
-<td>ID</td>
-<td>The ID of the kitten to retrieve</td>
+<td>address</td>
+<td>string</td>
+<td>15 Adelaide street</td>
+</tr>
+<tr>
+<td>city</td>
+<td>string</td>
+<td>Brisbane</td>
+</tr>
+<tr>
+<td>country</td>
+<td>string</td>
+<td>AU</td>
+</tr>
+<tr>
+<td>email</td>
+<td>string</td>
+<td>apicompany@example.com</td>
+</tr>
+<tr>
+<td>errors</td>
+<td><a href="#">errors</a></td>
+<td></td>
+</tr>
+<tr>
+<td>external_id</td>
+<td>integer</td>
+<td>123456</td>
+</tr>
+<tr>
+<td>id</td>
+<td>integer</td>
+<td>438</td>
+</tr>
+<tr>
+<td>name</td>
+<td>string</td>
+<td>API company</td>
+</tr>
+<tr>
+<td>phone</td>
+<td>string</td>
+<td>+61447135119</td>
+</tr>
+<tr>
+<td>state</td>
+<td>string</td>
+<td>QLD</td>
+</tr>
+<tr>
+<td>status</td>
+<td>string</td>
+<td>Company status. Default is <code>active</code>. Enumerated Values: <code>active</code>, <code>trial</code>, <code>in-active</code></td>
+</tr>
+<tr>
+<td>time_zone</td>
+<td>string</td>
+<td>Brisbane</td>
+</tr>
+<tr>
+<td>visitor_app_code</td>
+<td>string</td>
+<td>Activation code required for visitor app</td>
+</tr>
+<tr>
+<td>work_time_from</td>
+<td>string</td>
+<td>08:00</td>
+</tr>
+<tr>
+<td>work_time_into</td>
+<td>string</td>
+<td>20:00</td>
+</tr>
+<tr>
+<td>zip</td>
+<td>string</td>
+<td>4000</td>
 </tr>
 </tbody></table>
-<h2 id='delete-a-specific-kitten'>Delete a Specific Kitten</h2><pre class="highlight ruby tab-ruby"><code><span class="nb">require</span> <span class="s1">'kittn'</span>
-
-<span class="n">api</span> <span class="o">=</span> <span class="no">Kittn</span><span class="o">::</span><span class="no">APIClient</span><span class="p">.</span><span class="nf">authorize!</span><span class="p">(</span><span class="s1">'meowmeowmeow'</span><span class="p">)</span>
-<span class="n">api</span><span class="p">.</span><span class="nf">kittens</span><span class="p">.</span><span class="nf">delete</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</code></pre><pre class="highlight python tab-python"><code><span class="kn">import</span> <span class="nn">kittn</span>
-
-<span class="n">api</span> <span class="o">=</span> <span class="n">kittn</span><span class="o">.</span><span class="n">authorize</span><span class="p">(</span><span class="s">'meowmeowmeow'</span><span class="p">)</span>
-<span class="n">api</span><span class="o">.</span><span class="n">kittens</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-</code></pre><pre class="highlight shell tab-shell"><code>curl <span class="s2">"http://example.com/api/kittens/2"</span>
-  -X DELETE
-  -H <span class="s2">"Authorization: meowmeowmeow"</span>
-</code></pre><pre class="highlight javascript tab-javascript"><code><span class="kr">const</span> <span class="nx">kittn</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'kittn'</span><span class="p">);</span>
-
-<span class="kd">let</span> <span class="nx">api</span> <span class="o">=</span> <span class="nx">kittn</span><span class="p">.</span><span class="nx">authorize</span><span class="p">(</span><span class="s1">'meowmeowmeow'</span><span class="p">);</span>
-<span class="kd">let</span> <span class="nx">max</span> <span class="o">=</span> <span class="nx">api</span><span class="p">.</span><span class="nx">kittens</span><span class="p">.</span><span class="k">delete</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<h2 id='create-a-company'>Create a Company</h2>
+<blockquote>
+<p><code>POST /api/v1/companies</code></p>
+</blockquote>
+<pre class="highlight shell tab-shell"><code>curl -X POST --user some@ware.com:password <span class="se">\</span>
+  <span class="s2">"https://login.gymsales.net/api/v1/companies"</span> <span class="se">\</span>
+  -d <span class="s1">'{"name":"A Company Name", "visitor_app_code":"5893016"}'</span>
 </code></pre>
 <blockquote>
-<p>The above command returns JSON structured like this:</p>
+<p>Response</p>
 </blockquote>
 <pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
-  </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
-  </span><span class="s2">"deleted"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">":("</span><span class="w">
+  </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">452</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"external_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2895</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"API Company"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"apicompany@example.com"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"phone"</span><span class="p">:</span><span class="w"> </span><span class="s2">"+61447135119"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"address"</span><span class="p">:</span><span class="w"> </span><span class="s2">"15 Adelaide street"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"city"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Brisbane"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"QLD"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"zip"</span><span class="p">:</span><span class="w"> </span><span class="s2">"4000"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"country"</span><span class="p">:</span><span class="w"> </span><span class="s2">"AU"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"time_zone"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Brisbane"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"work_time_from"</span><span class="p">:</span><span class="w"> </span><span class="s2">"08:00"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"work_time_into"</span><span class="p">:</span><span class="w"> </span><span class="s2">"20:00"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"active"</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></code></pre>
-<p>This endpoint deletes a specific kitten.</p>
-<h3 id='http-request-3'>HTTP Request</h3>
-<p><code>DELETE http://example.com/kittens/&lt;ID&gt;</code></p>
-<h3 id='url-parameters-2'>URL Parameters</h3>
+</span></code></pre><h3 id='arguments'>Arguments</h3>
 <table><thead>
 <tr>
-<th>Parameter</th>
+<th>Name</th>
 <th>Description</th>
+<th>Example</th>
 </tr>
 </thead><tbody>
 <tr>
-<td>ID</td>
-<td>The ID of the kitten to delete</td>
+<td>address</td>
+<td>15 Adelaide street</td>
+<td></td>
+</tr>
+<tr>
+<td>city</td>
+<td>Brisbane</td>
+<td></td>
+</tr>
+<tr>
+<td>country</td>
+<td>AU</td>
+<td></td>
+</tr>
+<tr>
+<td>email</td>
+<td>apicompany@example.com</td>
+<td></td>
+</tr>
+<tr>
+<td>errors</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>external_id</td>
+<td>123456</td>
+<td></td>
+</tr>
+<tr>
+<td>id</td>
+<td>438</td>
+<td></td>
+</tr>
+<tr>
+<td>name</td>
+<td>API company</td>
+<td></td>
+</tr>
+<tr>
+<td>phone</td>
+<td>+61447135119</td>
+<td></td>
+</tr>
+<tr>
+<td>state</td>
+<td>QLD</td>
+<td></td>
+</tr>
+<tr>
+<td>status</td>
+<td>Company status. Default is <code>active</code>. Enumerated Values: <code>active</code>, <code>trial</code>, <code>in-active</code></td>
+<td><code>active</code></td>
+</tr>
+<tr>
+<td>time_zone</td>
+<td>Brisbane</td>
+<td></td>
+</tr>
+<tr>
+<td>visitor_app_code</td>
+<td>Activation code required for visitor app</td>
+<td>123456</td>
+</tr>
+<tr>
+<td>work_time_from</td>
+<td>08:00</td>
+<td></td>
+</tr>
+<tr>
+<td>work_time_into</td>
+<td>20:00</td>
+<td></td>
+</tr>
+<tr>
+<td>zip</td>
+<td>4000</td>
+<td></td>
 </tr>
 </tbody></table>
+<h3 id='returns'>Returns</h3>
+<p>Returns the company object if succeeded.</p>
+<h2 id='retrieve-a-company'>Retrieve a Company</h2>
+<blockquote>
+<p><code>GET /api/v1/companies/:company_id</code></p>
+</blockquote>
+<pre class="highlight shell tab-shell"><code>curl -X GET --user some@ware.com:password <span class="se">\</span>
+  <span class="s2">"https://login.gymsales.net/api/v1/companies/452"</span> <span class="se">\</span>
+</code></pre>
+<blockquote>
+<p>Response</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">452</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"external_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2895</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"API Company"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"apicompany@example.com"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"phone"</span><span class="p">:</span><span class="w"> </span><span class="s2">"+61447135119"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"address"</span><span class="p">:</span><span class="w"> </span><span class="s2">"15 Adelaide street"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"city"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Brisbane"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"QLD"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"zip"</span><span class="p">:</span><span class="w"> </span><span class="s2">"4000"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"country"</span><span class="p">:</span><span class="w"> </span><span class="s2">"AU"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"time_zone"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Brisbane"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"work_time_from"</span><span class="p">:</span><span class="w"> </span><span class="s2">"08:00"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"work_time_into"</span><span class="p">:</span><span class="w"> </span><span class="s2">"20:00"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"active"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre><h3 id='arguments-2'>Arguments</h3>
+<p><code>company_id</code> The id of the company to be retrieved</p>
+<h3 id='returns-2'>Returns</h3>
+<p>Returns the company object</p>
+<h2 id='update-a-company'>Update a Company</h2>
+<blockquote>
+<p><code>PUT /api/v1/companies/:company_id</code></p>
+</blockquote>
+<pre class="highlight shell tab-shell"><code>curl -X PUT --user some@ware.com:password <span class="se">\</span>
+  <span class="s2">"https://login.gymsales.net/api/v1/companies/452"</span> <span class="se">\</span>
+  -d <span class="s1">'{"name":"A Company Name", "visitor_app_code":"5893016"}'</span>
+</code></pre>
+<blockquote>
+<p>Response</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">452</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"external_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">2895</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"API Company"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"apicompany@example.com"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"phone"</span><span class="p">:</span><span class="w"> </span><span class="s2">"+61447135119"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"address"</span><span class="p">:</span><span class="w"> </span><span class="s2">"15 Adelaide street"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"city"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Brisbane"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"QLD"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"zip"</span><span class="p">:</span><span class="w"> </span><span class="s2">"4000"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"country"</span><span class="p">:</span><span class="w"> </span><span class="s2">"AU"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"time_zone"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Brisbane"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"work_time_from"</span><span class="p">:</span><span class="w"> </span><span class="s2">"08:00"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"work_time_into"</span><span class="p">:</span><span class="w"> </span><span class="s2">"20:00"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"active"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre><h3 id='arguments-3'>Arguments</h3>
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>address</td>
+<td>15 Adelaide street</td>
+<td></td>
+</tr>
+<tr>
+<td>city</td>
+<td>Brisbane</td>
+<td></td>
+</tr>
+<tr>
+<td>country</td>
+<td>AU</td>
+<td></td>
+</tr>
+<tr>
+<td>email</td>
+<td>apicompany@example.com</td>
+<td></td>
+</tr>
+<tr>
+<td>errors</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>external_id</td>
+<td>123456</td>
+<td></td>
+</tr>
+<tr>
+<td>id</td>
+<td>438</td>
+<td></td>
+</tr>
+<tr>
+<td>name</td>
+<td>API company</td>
+<td></td>
+</tr>
+<tr>
+<td>phone</td>
+<td>+61447135119</td>
+<td></td>
+</tr>
+<tr>
+<td>state</td>
+<td>QLD</td>
+<td></td>
+</tr>
+<tr>
+<td>status</td>
+<td>Company status. Default is <code>active</code>. Enumerated Values: <code>active</code>, <code>trial</code>, <code>in-active</code></td>
+<td><code>active</code></td>
+</tr>
+<tr>
+<td>time_zone</td>
+<td>Brisbane</td>
+<td></td>
+</tr>
+<tr>
+<td>visitor_app_code</td>
+<td>Activation code required for visitor app</td>
+<td>123456</td>
+</tr>
+<tr>
+<td>work_time_from</td>
+<td>08:00</td>
+<td></td>
+</tr>
+<tr>
+<td>work_time_into</td>
+<td>20:00</td>
+<td></td>
+</tr>
+<tr>
+<td>zip</td>
+<td>4000</td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id='returns-3'>Returns</h3>
+<p>Returns the company object if the update succeeded.</p>
 <h1 id='errors'>Errors</h1>
-<aside class="notice">
-This error section is stored in a separate file in <code>includes/_errors.md</code>. Slate allows you to optionally separate out your docs into many files...just save them to the <code>includes</code> folder and add them to the top of your <code>index.md</code>'s frontmatter. Files are included in the order listed.
-</aside>
-
-<p>The Kittn API uses the following error codes:</p>
+<p>The GymSales API uses the following error codes:</p>
 
 <table><thead>
 <tr>
