@@ -513,7 +513,16 @@
 <pre class="highlight shell tab-shell"><code>curl -X POST --user some@ware.com:password <span class="se">\</span>
   <span class="s2">"https://login.gymsales.net/api/v1/companies"</span> <span class="se">\</span>
   -d <span class="s1">'{"name":"A Company Name", "visitor_app_code":"5893016"}'</span>
-</code></pre>
+</code></pre><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/api/v1/companies</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">login.gymsales.net</span>
+<span class="na">Authorization</span><span class="p">:</span> <span class="s">Basic c29tZUB3YXJlLmNvbTpwYXNzd29yZA==</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+
+<span class="p">{</span><span class="w">
+  </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"A Company Name"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"visitor_app_code"</span><span class="p">:</span><span class="s2">"5893016"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
 <blockquote>
 <p>Response</p>
 </blockquote>
@@ -630,6 +639,9 @@
 </blockquote>
 <pre class="highlight shell tab-shell"><code>curl -X GET --user some@ware.com:password <span class="se">\</span>
   <span class="s2">"https://login.gymsales.net/api/v1/companies/452"</span> <span class="se">\</span>
+</code></pre><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/v1/companies/468</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">login.gymsales.net</span>
+<span class="na">Authorization</span><span class="p">:</span> <span class="s">Basic c29tZUB3YXJlLmNvbTpwYXNzd29yZA==</span>
 </code></pre>
 <blockquote>
 <p>Response</p>
@@ -661,7 +673,16 @@
 <pre class="highlight shell tab-shell"><code>curl -X PUT --user some@ware.com:password <span class="se">\</span>
   <span class="s2">"https://login.gymsales.net/api/v1/companies/452"</span> <span class="se">\</span>
   -d <span class="s1">'{"name":"A Company Name", "visitor_app_code":"5893016"}'</span>
-</code></pre>
+</code></pre><pre class="highlight http tab-http"><code><span class="nf">PUT</span> <span class="nn">/api/v1/companies/452</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Host</span><span class="p">:</span> <span class="s">login.gymsales.net</span>
+<span class="na">Authorization</span><span class="p">:</span> <span class="s">Basic c29tZUB3YXJlLmNvbTpwYXNzd29yZA==</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+
+<span class="p">{</span><span class="w">
+  </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"A Company Name"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"visitor_app_code"</span><span class="p">:</span><span class="s2">"5893016"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
 <blockquote>
 <p>Response</p>
 </blockquote>
