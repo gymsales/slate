@@ -12,6 +12,7 @@ toc_footers:
   - <a href='https://github.com/lord/slate'>Documentation Powered by Slate</a>
 
 includes:
+  - companies
   - errors
 
 search: true
@@ -19,221 +20,149 @@ search: true
 
 # Introduction
 
-Welcome to the Kittn API! You can use our API to access Kittn API endpoints, which can get information on various cats, kittens, and breeds in our database.
+GymSales is a fully hosted lead management system for the fitness industry. We provide a [REST](http://en.wikipedia.org/wiki/Representational_state_transfer) API built on [pragmatic RESTful design](http://www.vinaysahni.com/best-practices-for-a-pragmatic-restful-api) principles.
 
-We have language bindings in Shell, Ruby, Python, and JavaScript! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
+Our API uses resource-oriented URLs that leverage built in features of HTTP, like authentication, verbs and response codes. All request and response bodies are [JSON](http://en.wikipedia.org/wiki/JSON) encoded, including error responses. Any off-the-shelf HTTP client can be used to communicate with the API.
 
-This example API documentation page was created with [Slate](https://github.com/lord/slate). Feel free to edit it and use it as a base for your own API's documentation.
+We believe an API is a user interface for a developer - accordingly, we've made sure our API can be easily explored from the browser!
+
+## JSON Bodies
+
+All `POST`, `PUT` requests are [JSON](http://en.wikipedia.org/wiki/JSON) encoded and must have have content type of `application/x-www-form-urlencoded` or `application/json`, or the API will return a `415 Unsupported Media Type` status code.
+
+```shell
+curl -u email:password https://login.gymsales.net/api/v1/users/12345 \
+    -X PUT \
+    -H 'Content-Type: application/json' \
+    -d '{"first_name":"John"}'
+```
+
+>Raw HTTP Request:
+
+```http
+PUT /api/v1/users/12345 HTTP/1.1
+Authorization: Basic ZW1haWw6cGFzc3dvcmQ=
+Host: login.gymsales.net
+Accept: */*
+Content-Type: application/json
+Content-Length: 21
+
+{"first_name":"John"}
+```
+
+## HTTP Verbs
+
+We use standard HTTP verbs to indicate intent of a request:
+
+*   `GET` - To retrieve a resource or a collection of resources
+*   `POST` - To create a resource
+*   `PUT` - To modify a resource
+*   `DELETE` - To delete a resource
+
+## Limited HTTP Clients
+
+If you are using an HTTP client that doesn't support `PUT`, `PATCH` or `DELETE` requests, send a `POST`request with an `X-HTTP-Method-Override` header specifying the desired verb.
+
+```shell
+curl -u email:password https://login.gymsales.net/api/v1/users/1234 \
+    -X POST \
+    -H "X-HTTP-Method-Override: DELETE"
+```
+
+>Raw HTTP Request:
+
+```http
+POST /api/v1/users/12345 HTTP/1.1
+Authorization: Basic ZW1haWw6cGFzc3dvcmQ=
+Host: login.gymsales.net
+Accept: */*
+Content-Type: application/json
+Content-Length: 21
+X-HTTP-Method-Override: DELETE
+```
+
+## Responses
+
+All response bodies are [JSON](http://en.wikipedia.org/wiki/JSON) encoded.
+
+>A single resource is represented as a JSON object:
+
+```json
+{
+  "field1": "value",
+  "field2": true,
+  "field3": []
+}
+```
+
+>A collection of resources is represented as a JSON array of objects named `collection` and a `pagination` object with total pages and total entries fields:
+
+```json
+{
+  "collection": [
+    {
+      "field1": "value",
+      "field2": true,
+      "field3": []
+    },
+    {
+      "field1": "another value",
+      "field2": false,
+      "field3": []
+    }
+  ],
+  "pagination": {
+    "total_pages": 1,
+    "total_entries": 2
+  }
+}
+```
+
+Timestamps are in company time zone and formatted as [ISO8601](http://en.wikipedia.org/wiki/ISO_8601).
+
+Unset fields will be represented as a `null` instead of not being present. If the field is an array, it will be represented as an empty array - ie `[]`.
+
+## HTTP Status Codes
+
+We use HTTP status codes to indicate success or failure of a request.
+
+Success codes:
+
+*   `200 OK` - Request succeeded. Response included
+*   `201 Created` - Resource created. URL to new resource in Location header
+*   `204 No Content` - Request succeeded, but no response body
+
+Error codes:
+
+*   `400 Bad Request` - Could not parse request
+*   `401 Unauthorized` - No authentication credentials provided or authentication failed
+*   `403 Forbidden` - Authenticated user does not have access
+*   `404 Not Found` - Resource not found
+*   `415 Unsupported Media Type` - POST/PUT/PATCH request occurred without a `application/json`content type
+*   `422 Unprocessable Entity` - A request to modify or create a resource failed due to a validation error
+*   `500, 501, 502, 503, etc` - An internal server error occured
 
 # Authentication
 
-> To authorize, use this code:
+This API is authenticated using [HTTP Basic Auth](https://en.wikipedia.org/wiki/Basic_access_authentication) over HTTPS. Any requests over plain HTTP will fail.
 
-```ruby
-require 'kittn'
+A user's email address and password can be provided as auth credentials
 
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-```
+All requests are associated with a specific user in GymSales and permissions are limited to that user's capabilities.
 
 ```shell
-# With shell, you can just pass the correct header with each request
-curl "api_endpoint_here"
-  -H "Authorization: meowmeowmeow"
+$ curl -u email:password https://login.gymsales.net/api/v1/
 ```
 
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
+```http
+POST /api/v1/users/12345 HTTP/1.1
+Authorization: Basic ZW1haWw6cGFzc3dvcmQ=
 ```
 
-> Make sure to replace `meowmeowmeow` with your API key.
+GymSales expects for the API key to be included in all API requests to the server in a header that looks like the following:
 
-Kittn uses API keys to allow access to the API. You can register a new Kittn API key at our [developer portal](http://example.com/developers).
+`Authorization: Basic <credentials>`, where credentials is the base64 encoding of id and password joined by a single colon (:).
 
-Kittn expects for the API key to be included in all API requests to the server in a header that looks like the following:
 
-`Authorization: meowmeowmeow`
-
-<aside class="notice">
-You must replace <code>meowmeowmeow</code> with your personal API key.
-</aside>
-
-# Kittens
-
-## Get All Kittens
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get()
-```
-
-```shell
-curl "http://example.com/api/kittens"
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let kittens = api.kittens.get();
-```
-
-> The above command returns JSON structured like this:
-
-```json
-[
-  {
-    "id": 1,
-    "name": "Fluffums",
-    "breed": "calico",
-    "fluffiness": 6,
-    "cuteness": 7
-  },
-  {
-    "id": 2,
-    "name": "Max",
-    "breed": "unknown",
-    "fluffiness": 5,
-    "cuteness": 10
-  }
-]
-```
-
-This endpoint retrieves all kittens.
-
-### HTTP Request
-
-`GET http://example.com/api/kittens`
-
-### Query Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-include_cats | false | If set to true, the result will also include cats.
-available | true | If set to false, the result will include kittens that have already been adopted.
-
-<aside class="success">
-Remember — a happy kitten is an authenticated kitten!
-</aside>
-
-## Get a Specific Kitten
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```shell
-curl "http://example.com/api/kittens/2"
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.get(2);
-```
-
-> The above command returns JSON structured like this:
-
-```json
-{
-  "id": 2,
-  "name": "Max",
-  "breed": "unknown",
-  "fluffiness": 5,
-  "cuteness": 10
-}
-```
-
-This endpoint retrieves a specific kitten.
-
-<aside class="warning">Inside HTML code blocks like this one, you can't use Markdown, so use <code>&lt;code&gt;</code> blocks to denote code.</aside>
-
-### HTTP Request
-
-`GET http://example.com/kittens/<ID>`
-
-### URL Parameters
-
-Parameter | Description
---------- | -----------
-ID | The ID of the kitten to retrieve
-
-## Delete a Specific Kitten
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.delete(2)
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.delete(2)
-```
-
-```shell
-curl "http://example.com/api/kittens/2"
-  -X DELETE
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.delete(2);
-```
-
-> The above command returns JSON structured like this:
-
-```json
-{
-  "id": 2,
-  "deleted" : ":("
-}
-```
-
-This endpoint deletes a specific kitten.
-
-### HTTP Request
-
-`DELETE http://example.com/kittens/<ID>`
-
-### URL Parameters
-
-Parameter | Description
---------- | -----------
-ID | The ID of the kitten to delete
+# Resources
 
