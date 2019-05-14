@@ -53,6 +53,18 @@ curl -X POST --user some@ware.com:password \
   -d '{"name":"A Company Name", "visitor_app_code":"5893016"}'
 ```
 
+```http
+POST /api/v1/companies HTTP/1.1
+Host: login.gymsales.net
+Authorization: Basic c29tZUB3YXJlLmNvbTpwYXNzd29yZA==
+Content-Type: application/json
+
+{
+  "name": "A Company Name",
+  "visitor_app_code":"5893016"
+}
+```
+
 >Response
 
 ```json
@@ -107,6 +119,12 @@ curl -X GET --user some@ware.com:password \
   "https://login.gymsales.net/api/v1/companies/452" \
 ```
 
+```http
+GET /api/v1/companies/468 HTTP/1.1
+Host: login.gymsales.net
+Authorization: Basic c29tZUB3YXJlLmNvbTpwYXNzd29yZA==
+```
+
 >Response
 
 ```json
@@ -144,6 +162,18 @@ Returns the company object
 curl -X PUT --user some@ware.com:password \
   "https://login.gymsales.net/api/v1/companies/452" \
   -d '{"name":"A Company Name", "visitor_app_code":"5893016"}'
+```
+
+```http
+PUT /api/v1/companies/452 HTTP/1.1
+Host: login.gymsales.net
+Authorization: Basic c29tZUB3YXJlLmNvbTpwYXNzd29yZA==
+Content-Type: application/json
+
+{
+  "name": "A Company Name",
+  "visitor_app_code":"5893016"
+}
 ```
 
 >Response
